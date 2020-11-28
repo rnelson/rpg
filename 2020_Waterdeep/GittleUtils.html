@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Gittle</title>
+	<meta name="description" content="Utilities for Gittle">
+	<meta name="author" content="Ross Nelson">
+	<style type="text/css">
+		* {
+			box-sizing: border-box;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+		}
+
+		body {
+			font-family: Helvetica;
+    		-webkit-font-smoothing: antialiased;
+		}
+
+		.book-text {
+			margin: 25px;
+			padding: 10px;
+			background-color: #a598923a;
+			border-radius: 6px;
+			font-size: 12px;
+		}
+
+		.book-text .book-h6 {
+			font-weight: bold;
+			font-style: italic;
+		}
+
+		.wrap-collabsible {
+			margin-bottom: 1.2rem 0;
+		}
+
+		input[type='checkbox'].hide-check {
+			display: none;
+		}
+
+		.lbl-toggle {
+			margin-top: 0.8rem;
+
+			display: block;
+
+			font-weight: bold;
+			font-size: 1.2rem;
+			text-align: center;
+
+			padding: 6px;
+
+			color: #444444;
+			background: #a6acb3;
+
+			cursor: pointer;
+
+			border-radius: 7px;
+			transition: all 0.25s ease-out;
+		}
+
+		.lbl-toggle:hover {
+			color: #727171;
+		}
+
+		.lbl-toggle::before {
+			content: ' ';
+			display: inline-block;
+
+			border-top: 5px solid transparent;
+			border-bottom: 5px solid transparent;
+			border-left: 5px solid currentColor;
+			vertical-align: middle;
+			margin-right: .7rem;
+			transform: translateY(-2px);
+
+			transition: transform .2s ease-out;
+		}
+
+		.toggle:checked + .lbl-toggle::before {
+			transform: rotate(90deg) translateX(-3px);
+		}
+
+		.collapsible-content {
+			max-height: 0px;
+			overflow: hidden;
+			transition: max-height .25s ease-in-out;
+		}
+
+		.toggle:checked + .lbl-toggle + .collapsible-content {
+			max-height: 100vh;
+		}
+
+		.toggle:checked + .lbl-toggle {
+			border-bottom-right-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+
+		.collapsible-content .content-inner {
+			background: rgba(107, 107, 107, 0.13);
+			border-bottom: 1px solid#a6acb3;
+			border-left: 1px solid #a6acb3;
+			border-right: 1px solid #a6acb3;
+			border-bottom-left-radius: 7px;
+			border-bottom-right-radius: 7px;
+			padding: .5rem 1rem;
+		}
+
+		.table-wrapper{
+			margin: 10px 20px 20px 20px;
+			/*box-shadow: 0px 5px 5px rgba( 0, 0, 0, 0.2 );*/
+		}
+
+		.fl-table {
+			border-radius: 5px;
+			font-size: 14px;
+			font-weight: normal;
+			border: none;
+			width: 30%;
+			max-width: 50%;
+			border-collapse: collapse;
+			white-space: nowrap;
+			background-color: white;
+		}
+
+		.fl-table td, .fl-table th {
+			text-align: center;
+			padding: 8px;
+		}
+
+		.fl-table td {
+			border-right: 1px solid #f8f8f8;
+			font-size: 14px;
+		}
+
+		.fl-table thead th {
+			color: #464646;
+			background: #90e2ec;
+		}
+
+		.fl-table thead th:nth-child(odd) {
+			color: #ffffff;
+			background: #0fb454;
+		}
+
+		.fl-table tr:nth-child(even) {
+			background: #F8F8F8;
+		}
+
+		@media (max-width: 767px) {
+			.fl-table {
+				display: block;
+				width: 100%;
+			}
+			.table-wrapper:before{
+				content: "Scroll horizontally >";
+				display: block;
+				text-align: right;
+				font-size: 12px;
+				color: white;
+				padding: 0 0 10px;
+			}
+			.fl-table thead, .fl-table tbody, .fl-table thead th {
+				display: block;
+			}
+			.fl-table thead th:last-child{
+				border-bottom: none;
+			}
+			.fl-table thead {
+				float: left;
+			}
+			.fl-table tbody {
+				width: auto;
+				position: relative;
+				overflow-x: auto;
+			}
+			.fl-table td, .fl-table th {
+				padding: 20px .625em .625em .625em;
+				height: 60px;
+				vertical-align: middle;
+				box-sizing: border-box;
+				overflow-x: hidden;
+				overflow-y: auto;
+				width: 120px;
+				font-size: 13px;
+				text-overflow: ellipsis;
+			}
+			.fl-table thead th {
+				text-align: left;
+				border-bottom: 1px solid #f7f7f9;
+			}
+			.fl-table tbody tr {
+				display: table-cell;
+			}
+			.fl-table tbody tr:nth-child(odd) {
+				background: none;
+			}
+			.fl-table tr:nth-child(even) {
+				background: transparent;
+			}
+			.fl-table tr td:nth-child(odd) {
+				background: #F8F8F8;
+				border-right: 1px solid #E6E4E4;
+			}
+			.fl-table tr td:nth-child(even) {
+				border-right: 1px solid #E6E4E4;
+			}
+			.fl-table tbody td {
+				display: block;
+				text-align: center;
+			}
+		}
+	</style>
+	<style type="text/css">
+		fieldset {
+			width: max-content;
+		}
+		
+		legend {
+			background-color: rgb(83, 83, 83);
+			color: #fff;
+			padding: 3px 6px;
+		}
+
+		.output {
+			font: 1rem 'Fira Sans', sans-serif;
+		}
+
+		input {
+			margin: .4rem;
+		}
+
+		#rolls-downtime fieldset {
+			margin-bottom: 10px;
+		}
+
+		#rolls-downtime input[type='text'] {
+			width: 30px;
+			border-radius: 5px;
+			text-align: center;
+		}
+
+		#rolls-downtime label {
+			margin-right: 10px;
+		}
+
+		#rolls-downtime #downtime-roll-button {
+			font-size: 16px;
+			padding: 10px;
+			width: 80px;
+		}
+
+		#downtime-results {
+			margin: 15px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Gittle's Utilities</h1>
+	<h2>Downtime</h2>
+	<div class="section" id="downtime">
+		<div class="wrap-collapsible">
+			<input id="collapsible-rolls" class="toggle hide-check" type="checkbox" checked>
+			<label for="collapsible-rolls" class="lbl-toggle">Roll</label>
+			<div class="collapsible-content">
+				<div class="content-inner">
+					<form id="rolls-downtime">
+						<fieldset>
+							<legend>Ability Modifiers</legend>
+
+							<input type="text" id="rolls-downtime-STR" value="-1" />
+							<label for="rolls-downtime-STR">STR</label>
+
+							<input type="text" id="rolls-downtime-DEX" value="+2" />
+							<label for="rolls-downtime-DEX">DEX</label>
+
+							<input type="text" id="rolls-downtime-CON" value="+2" />
+							<label for="rolls-downtime-CON">CON</label>
+
+							<input type="text" id="rolls-downtime-INT" value="+0" />
+							<label for="rolls-downtime-INT">INT</label>
+
+							<input type="text" id="rolls-downtime-WIS" value="+0" />
+							<label for="rolls-downtime-WIS">WIS</label>
+
+							<input type="text" id="rolls-downtime-CHA" value="+4" />
+							<label for="rolls-downtime-CHA">CHA</label>
+						</fieldset>
+
+						<fieldset>
+							<legend>Lifestyle</legend>
+
+							<input type="radio" id="rolls-downtime-lifestyle-wretched" name="downtime-lifestyle" value="wretched" />
+							<label for="rolls-downtime-lifestyle-wretched">Wretched</label><br />
+							<input type="radio" id="rolls-downtime-lifestyle-squalid" name="downtime-lifestyle" value="squalid" />
+							<label for="rolls-downtime-lifestyle-squalid">Squalid (1 sp)</label><br />
+							<input type="radio" id="rolls-downtime-lifestyle-poor" name="downtime-lifestyle" value="poor" checked />
+							<label for="rolls-downtime-lifestyle-poor">Poor (2 sp)</label><br />
+							<input type="radio" id="rolls-downtime-lifestyle-modest" name="downtime-lifestyle" value="modest" />
+							<label for="rolls-downtime-lifestyle-modest">Modest (1 gp)</label><br />
+							<input type="radio" id="rolls-downtime-lifestyle-comfortable" name="downtime-lifestyle" value="comfortable" />
+							<label for="rolls-downtime-lifestyle-comfortable">Comfortable (2 gp)</label><br />
+							<input type="radio" id="rolls-downtime-lifestyle-wealthy" name="downtime-lifestyle" value="wealthy" />
+							<label for="rolls-downtime-lifestyle-wealthy">Wealthy (4 gp)</label><br />
+							<input type="radio" id="rolls-downtime-lifestyle-aristocratic" name="downtime-lifestyle" value="aristocratic" />
+							<label for="rolls-downtime-lifestyle-aristocratic">Aristocratic (10+ gp)</label><br />
+						</fieldset>
+
+						<fieldset>
+							<legend>Complication</legend>
+
+							<input type="checkbox" id="rolls-downtime-complication-disadvantage" />
+							<label for="rolls-downtime-complication-disadvantage">Roll with disadvantage</label>
+						</fieldset>
+
+						<fieldset>
+							<legend>Time</legend>
+
+							<input type="text" id="rolls-downtime-days" value="7" />
+							<label for="rolls-downtime-days">days (expenses)</label><br />
+
+							<input type="text" id="rolls-downtime-workdays" value="7" />
+							<label for="rolls-downtime-workdays">workdays (income)</label>
+						</fieldset>
+
+						<button id="downtime-roll-button" onclick="return rollDowntime();">Roll!</button>
+					</form>
+
+					<div id="downtime-results"></div>
+				</div>
+			</div>
+		</div>
+
+		<div class="wrap-collapsible">
+			<input id="collapsible-wages" class="toggle hide-check" type="checkbox">
+			<label for="collapsible-wages" class="lbl-toggle">Wages</label>
+			<div class="collapsible-content">
+				<div class="content-inner">
+					<div class="book-text">
+						<p>
+							When all else fails, an adventurer can turn to an honest 
+							trade to earn a living. This activity represents a character's 
+							attempt to find temporary work, the quality and
+							ages of which are difficult to predict.
+						</p>
+						<p>
+							<span class="book-h6">Resources.</span> Performing a job requires one 
+							workweek of effort.
+						</p>
+						<p>
+							<span class="book-h6">Resolution.</span> To determine how much money a 
+							character earns, the character makes an ability check: Strength (Athletics), 
+							Dexterity (Acrobatics), Intelligence using a set of tools, Charisma 
+							(Performance), or Charisma using a musical instrument. Consult the Wages 
+							table to see how much money is generated according to the total of the 
+							check.
+						</p>
+					</div>
+					<div class="table-wrapper">
+						<table class="fl-table">
+							<thead>
+								<tr>
+									<th>Check Total</th>
+									<th>Earnings</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>9 or lower</td>
+									<td>Poor lifestyle for the week</td>
+								</tr>
+								<tr>
+									<td>10-14</td>
+									<td>Moderate lifestyle for the week</td>
+								</tr>
+								<tr>
+									<td>15-20</td>
+									<td>Comfortable lifestyle for the week + 25 gp</td>
+								</tr>
+								<tr>
+									<td>21+</td>
+									<td>Comfortable lifestyle for the week + 25 gp</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="wrap-collapsible">
+			<input id="collapsible-complications" class="toggle hide-check" type="checkbox">
+			<label for="collapsible-complications" class="lbl-toggle">Work Complications</label>
+			<div class="collapsible-content">
+				<div class="content-inner">
+					<div class="book-text">
+						<p>
+							<span class="book-h6">Complications.</span> Ordinary work is rarely filled 
+							with significant complications. Still, the Work Complications table can add 
+							some difficulties to a worker's life. Each workweek of activity brings a 10 
+							percent chance that a character encounters a complication.
+						</p>
+					</div>
+					<div class="table-wrapper">
+						<table class="fl-table">
+							<thead>
+								<tr>
+									<th>d6</th>
+									<th>Complication</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>1</td>
+									<td>A difficult customer or a fight with a coworker reduces the wages you earn by one category.</td>
+								</tr>
+								<tr>
+									<td>2</td>
+									<td>Your employer's financial difficulties result in your not being paid.</td>
+								</tr>
+								<tr>
+									<td>3</td>
+									<td>A coworker with ties to an important family in town takes a dislike to you.</td>
+								</tr>
+								<tr>
+									<td>4</td>
+									<td>Your employer is involved with a dark cult or a criminal enterprise.</td>
+								</tr>
+								<tr>
+									<td>5</td>
+									<td>A crime ring targets your business for extortion.</td>
+								</tr>
+								<tr>
+									<td>6</td>
+									<td>You gain a reputation for laziness (unjustified or not, as you choose), giving you disadvantage on checks made for this downtime activity for the next six workweeks you devote to it.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		let theLog = '';
+		function log(message) {
+			console.log(message);
+			theLog = `${theLog}<br>${message}`;
+
+			document.getElementById('downtime-results').innerHTML = theLog;
+		}
+
+		function roll(min = 1, max = 20) {
+			return Math.floor(Math.random() * (max - min) + min);
+		}
+
+		function rollDowntime() {
+			const daysText = document.getElementById('rolls-downtime-days').value;
+			const days = Number.parseInt(daysText, 10);
+			const workdaysText = document.getElementById('rolls-downtime-workdays').value;
+			const workdays = Number.parseInt(workdaysText, 10);
+
+			const chaModText = document.getElementById('rolls-downtime-CHA').value;
+			const chaMod = Number.parseInt(chaModText, 10);
+
+			const lifestyleButtons = document.getElementsByName('downtime-lifestyle');
+			var lifestyle;
+			for (let i = 0, length = lifestyleButtons.length; i < length; i++) {
+				if (lifestyleButtons[i].checked) {
+					lifestyle = lifestyleButtons[i].value;
+					break;
+				}
+			}
+
+			var lifestyleCostSP;
+			switch (lifestyle) {
+				case 'wretched':
+					lifestyleCostSP = 0;
+					break;
+				case 'squalid':
+					lifestyleCostSP = 1;
+					break;
+				case 'poor':
+					lifestyleCostSP = 2;
+					break;
+				case 'modest':
+					lifestyleCostSP = 10;
+					break;
+				case 'comfortable':
+					lifestyleCostSP = 20;
+					break;
+				case 'wealthy':
+					lifestyleCostSP = 40;
+					break;
+				case 'aristocratic':
+					lifestyleCostSP = 100;
+					break;
+			}
+
+			const earningsRoll = roll();
+			let earningsResult = earningsRoll + chaMod;
+			if (earningsResult < 0) earningsResult = 0;
+			log(`Rolling for earnings: ${earningsRoll} + ${chaMod} = ${earningsResult}`);
+
+			const complicationsRoll = 1; // roll(1, 10);
+			log(`Rolling for complications chance: ${complicationsRoll}`);
+
+			if (complicationsRoll == 1) {
+				const d6 = roll(1, 6);
+				log(`There's a complication: ${d6}`);
+				switch (d6) {
+					case 1:
+						log('A difficult customer or a fight with a coworker reduces the wages you earn by one category.');
+						if (earningsResult  > 20) {
+							earningsResult = 20;
+						} else if (earningsResult > 14) {
+							earningsResult = 14;
+						} else if (earningsResult > 9) {
+							earningsResult = 9;
+						}
+						break;
+					case 2:
+						log('Your employer\'s financial difficulties result in your not being paid.');
+						earningsResult = -1;
+						break;
+					case 3:
+						log('A coworker with ties to an important family in town takes a dislike to you.');
+						break;
+					case 4:
+						log('Your employer is involved with a dark cult or a criminal enterprise.');
+						break;
+					case 5:
+						log('A crime ring targets your business for extortion.');
+						break;
+					case 6:
+						log('You gain a reputation for laziness (unjustified or not, as you choose), giving you disadvantage on checks made for this downtime activity for the next six workweeks you devote to it.');
+						break;
+				}
+			}			
+
+			var earningsSP;
+			if (earningsResult < 0) {
+				log('Ouch, no pay.');
+				earningsSP = 0;
+			}
+			else if (earningsResult < 10) {
+				log('Not a great week. Poor wages.');
+				earningsSP = 2 * workdays;
+			} else if (earningsResult < 15) {
+				log('Could have been a better week. Modest wages.');
+				earningsSP = 10 * workdays;
+			}
+			else if (earningsResult < 21) {
+				log('Nice! Comfortable wages.');
+				earningsSP = 20 * workdays;
+			} else {
+				log('The gods are smiling upon Gittle. Comfortable wages, plus a bonus of 25 gp.');
+				earningsSP = 20 * workdays + 250;
+			}
+
+			const earningsCleanGP = Math.floor(earningsSP / 10);
+			const earningsCleanSP = earningsSP % 10;
+			log(`Before expenses, Gittle earned ${earningsSP} sp (${earningsCleanGP} gp + ${earningsCleanSP} sp)`);
+
+			const expensesSP = lifestyleCostSP * days;
+			const expensesCleanGP = Math.floor(expensesSP / 10);
+			const expensesCleanSP = expensesSP % 10;
+			log(`Expenses for ${days} days is ${expensesSP} sp (${expensesCleanGP} gp + ${expensesCleanSP} sp)`);
+
+			const netSP = earningsSP - expensesSP;
+			const netCleanGP = Math.floor(Math.abs(netSP) / 10);
+			const netCleanSP = Math.abs(netSP) % 10;
+			log(`Net cost/profit is ${netSP} sp (${netCleanGP} gp + ${netCleanSP} sp)`);
+
+			return false;
+		}
+	</script>
+</body>
+</html>
