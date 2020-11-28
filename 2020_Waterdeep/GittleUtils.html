@@ -448,8 +448,17 @@
 			document.getElementById('downtime-results').innerHTML = theLog;
 		}
 
-		function roll(min = 1, max = 20) {
-			return Math.floor(Math.random() * (max - min) + min);
+		function roll(min = 1, max = 20, disadvantage = false) {
+			const roll1 = Math.floor(Math.random() * (max - min) + min);
+			const roll2 = Math.floor(Math.random() * (max - min) + min);
+
+			console.log(`DEBUG: min=${min}, max=${max}, disadvantage=${disadvantage}, roll1=${roll1}, roll2=${roll2}`);
+
+			if (disadvantage) {
+				return Math.min(roll1, roll2);
+			} else {
+				return roll1;
+			}
 		}
 
 		function rollDowntime() {
@@ -460,6 +469,8 @@
 
 			const chaModText = document.getElementById('rolls-downtime-CHA').value;
 			const chaMod = Number.parseInt(chaModText, 10);
+
+			const rollWithDisadvantage = document.getElementById('rolls-downtime-complication-disadvantage').checked;
 
 			const lifestyleButtons = document.getElementsByName('downtime-lifestyle');
 			var lifestyle;
@@ -495,16 +506,16 @@
 					break;
 			}
 
-			const earningsRoll = roll();
+			const earningsRoll = roll(1, 20, rollWithDisadvantage);
 			let earningsResult = earningsRoll + chaMod;
 			if (earningsResult < 0) earningsResult = 0;
 			log(`Rolling for earnings: ${earningsRoll} + ${chaMod} = ${earningsResult}`);
 
-			const complicationsRoll = 1; // roll(1, 10);
+			const complicationsRoll = roll(1, 10, rollWithDisadvantage);
 			log(`Rolling for complications chance: ${complicationsRoll}`);
 
 			if (complicationsRoll == 1) {
-				const d6 = roll(1, 6);
+				const d6 = roll(1, 6, rollWithDisadvantage);
 				log(`There's a complication: ${d6}`);
 				switch (d6) {
 					case 1:
